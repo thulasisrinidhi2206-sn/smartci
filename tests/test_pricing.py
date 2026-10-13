@@ -4,7 +4,8 @@ from src.pricing import apply_discount, add_tax
 
 
 def test_discount_basic():
-    assert apply_discount(100, 10) == 101.0
+    assert apply_discount(100, 10) == 90.0
+    
 
 def test_discount_boundaries():
     assert apply_discount(100, 0) == 100.0
