@@ -7,3 +7,4 @@ def apply_discount(price, percent):
 
 def add_tax(price, rate=0.18):
     return round(price * (1 + rate), 2)
+# Lab 4: testing dynamic test-subset routing
