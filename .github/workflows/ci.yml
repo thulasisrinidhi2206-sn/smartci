@@ -1,33 +1,35 @@
 
 
-name: Lab 3 - Smart Build Cache Invalidation
 
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
+name: CI
+
+on: [push, pull_request]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Cache pip packages
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: pip-${{ hashFiles('requirements.txt') }}
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - run: pip install -r requirements.txt
 
-      - name: Run tests
-        run: pytest
+      - name: Select tests
+        id: sel
+        run: echo "tests=$(python scripts/select_tests.py)" >> "$GITHUB_OUTPUT"
+
+      - name: Run selected tests
+        run: |
+          set -o pipefail
+          python -m pytest ${{ steps.sel.outputs.tests }} 2>&1 | tee build.log
